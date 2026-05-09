@@ -1,35 +1,16 @@
-# CookFlow
+# React + Vite
 
-Минималистичное приложение: лента рецептов в формате Shorts, сохранённые рецепты и недельный план питания.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-- **Лента** — вертикальный скролл, по одному видео (YouTube Shorts о готовке).
-- **Рецепты** — сохранённые и созданные через «Рецепт от ИИ».
-- **План** — календарь на неделю (завтрак / обед / ужин).
+Currently, two official plugins are available:
 
-Один файл `index.html`, без сборки. Открывается в браузере или через GitHub Pages.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## Как открыть с телефона по ссылке (GitHub Pages)
+## React Compiler
 
-1. Создайте репозиторий на GitHub: https://github.com/new  
-   - Имя, например: `cookflow`  
-   - **Не** ставьте галочку «Add a README»  
-   - Create repository  
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-2. В терминале в папке проекта выполните (подставьте свой логин и имя репозитория):
+## Expanding the ESLint configuration
 
-   ```bash
-   cd "/Users/sergei/Documents/Еда 2"
-   git remote add origin https://github.com/ВАШ_ЛОГИН/cookflow.git
-   git branch -M main
-   git push -u origin main
-   ```
-
-3. Включите GitHub Pages в репозитории:
-   - Откройте репозиторий на GitHub → **Settings** → **Pages**
-   - **Source**: Deploy from a branch
-   - **Branch**: `main` → папка `/ (root)` → Save
-
-4. Через 1–2 минуты сайт будет доступен по адресу:
-   - `https://ВАШ_ЛОГИН.github.io/cookflow/`
-
-Эту ссылку можно открыть на телефоне и добавить на главный экран как веб-приложение.
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

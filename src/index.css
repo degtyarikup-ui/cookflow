@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  background-color: #FAFAF9;
+}
+
+/* Custom scroll snap styling */
+.reels-container {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 100dvh;
+  height: 100vh;
+  -webkit-overflow-scrolling: touch;
+}
+
+.reels-container > * {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
