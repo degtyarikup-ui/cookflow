@@ -93,7 +93,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AppProvider>
-        <BrowserRouter>
+        <BrowserRouter basename="/cookflow/">
           <Routes>
             <Route path="/" element={<Layout><Feed /></Layout>} />
             <Route path="/library" element={<Layout><Library /></Layout>} />
