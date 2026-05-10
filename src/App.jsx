@@ -5,8 +5,41 @@ import BookmarkIcon from '@mui/icons-material/Bookmark'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import StarIcon from '@mui/icons-material/Star'
+import { AnimatePresence, motion } from 'framer-motion'
 
 import { AppProvider } from './context/AppContext'
+
+const PageWrapper = ({ children }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.2 }}
+      style={{ height: '100%' }}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageWrapper><Feed /></PageWrapper>} />
+        <Route path="/library" element={<PageWrapper><Library /></PageWrapper>} />
+        <Route path="/planner" element={<PageWrapper><Planner /></PageWrapper>} />
+        <Route path="/shopping" element={<PageWrapper><ShoppingList /></PageWrapper>} />
+        <Route path="/premium" element={<PageWrapper><PremiumModal /></PageWrapper>} />
+        <Route path="/cooking/:id" element={<PageWrapper><CookingMode /></PageWrapper>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
 
 // Layout component to handle routing and bottom nav
 const Layout = ({ children }) => {
@@ -14,46 +47,48 @@ const Layout = ({ children }) => {
   const location = useLocation();
 
   let value = 0;
-  switch (location.pathname) {
-    case '/': value = 0; break;
-    case '/library': value = 1; break;
-    case '/planner': value = 2; break;
-    case '/shopping': value = 3; break;
-    case '/premium': value = 4; break;
-    default: value = 0;
-  }
+  if (location.pathname.startsWith('/library')) value = 1;
+  else if (location.pathname.startsWith('/planner')) value = 2;
+  else if (location.pathname.startsWith('/shopping')) value = 3;
+  else if (location.pathname.startsWith('/premium')) value = 4;
+
+  // Do not show bottom nav in cooking mode
+  const isCookingMode = location.pathname.startsWith('/cooking');
 
   return (
     <div className="flex flex-col min-h-screen bg-background-soft">
-      <main className="flex-1 overflow-hidden relative pb-[70px]">
+      <main className="flex-1 overflow-hidden relative" style={{ paddingBottom: isCookingMode ? 0 : '70px' }}>
         {children}
       </main>
-      <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50 }} elevation={3}>
-        <BottomNavigation
-          showLabels
-          value={value}
-          onChange={(event, newValue) => {
-            switch (newValue) {
-              case 0: navigate('/'); break;
-              case 1: navigate('/library'); break;
-              case 2: navigate('/planner'); break;
-              case 3: navigate('/shopping'); break;
-              case 4: navigate('/premium'); break;
-            }
-          }}
-          sx={{
-             '& .MuiBottomNavigationAction-root': { minWidth: 'auto', padding: '6px 0' },
-             paddingBottom: 'env(safe-area-inset-bottom)',
-             height: 'calc(56px + env(safe-area-inset-bottom))'
-          }}
-        >
-          <BottomNavigationAction label="Лента" icon={<HomeIcon />} />
-          <BottomNavigationAction label="Рецепты" icon={<BookmarkIcon />} />
-          <BottomNavigationAction label="План" icon={<CalendarMonthIcon />} />
-          <BottomNavigationAction label="Список" icon={<ShoppingCartIcon />} />
-          <BottomNavigationAction label="Premium" icon={<StarIcon sx={{ color: '#F59E0B' }}/>} />
-        </BottomNavigation>
-      </Paper>
+
+      {!isCookingMode && (
+        <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50 }} elevation={3}>
+          <BottomNavigation
+            showLabels
+            value={value}
+            onChange={(event, newValue) => {
+              switch (newValue) {
+                case 0: navigate('/'); break;
+                case 1: navigate('/library'); break;
+                case 2: navigate('/planner'); break;
+                case 3: navigate('/shopping'); break;
+                case 4: navigate('/premium'); break;
+              }
+            }}
+            sx={{
+               '& .MuiBottomNavigationAction-root': { minWidth: 'auto', padding: '6px 0' },
+               paddingBottom: 'env(safe-area-inset-bottom)',
+               height: 'calc(56px + env(safe-area-inset-bottom))'
+            }}
+          >
+            <BottomNavigationAction label="Лента" icon={<HomeIcon />} />
+            <BottomNavigationAction label="Рецепты" icon={<BookmarkIcon />} />
+            <BottomNavigationAction label="План" icon={<CalendarMonthIcon />} />
+            <BottomNavigationAction label="Список" icon={<ShoppingCartIcon />} />
+            <BottomNavigationAction label="Premium" icon={<StarIcon sx={{ color: '#F59E0B' }}/>} />
+          </BottomNavigation>
+        </Paper>
+      )}
     </div>
   );
 };
@@ -94,14 +129,9 @@ function App() {
       <CssBaseline />
       <AppProvider>
         <BrowserRouter basename="/cookflow/">
-          <Routes>
-            <Route path="/" element={<Layout><Feed /></Layout>} />
-            <Route path="/library" element={<Layout><Library /></Layout>} />
-            <Route path="/planner" element={<Layout><Planner /></Layout>} />
-            <Route path="/shopping" element={<Layout><ShoppingList /></Layout>} />
-            <Route path="/premium" element={<Layout><PremiumModal /></Layout>} />
-            <Route path="/cooking/:id" element={<CookingMode />} />
-          </Routes>
+          <Layout>
+            <AnimatedRoutes />
+          </Layout>
         </BrowserRouter>
       </AppProvider>
     </ThemeProvider>
