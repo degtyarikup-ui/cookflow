@@ -7,16 +7,28 @@ import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import AdUnitsIcon from '@mui/icons-material/AdUnits';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
+import { supabase } from '../supabaseClient';
+
 export const PremiumModal = () => {
-  const { isPremium, setIsPremium } = useAppContext();
+  const { isPremium, setIsPremium, user } = useAppContext();
   const [loading, setLoading] = useState(false);
 
-  const togglePremium = () => {
+  const togglePremium = async () => {
     setLoading(true);
-    setTimeout(() => {
-      setIsPremium(!isPremium);
+    try {
+      const newStatus = !isPremium;
+      if (user && !supabase.isMock) {
+        await supabase
+          .from('profiles')
+          .update({ is_premium: newStatus })
+          .eq('id', user.id);
+      }
+      setIsPremium(newStatus);
+    } catch (e) {
+      console.error(e);
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   };
 
   return (

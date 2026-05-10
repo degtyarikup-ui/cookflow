@@ -117,22 +117,42 @@ const theme = createTheme({
 
 import { Feed } from './components/Feed'
 import { Library } from './pages/Library'
+import { AuthOverlay } from './components/AuthOverlay'
+import { Onboarding } from './pages/Onboarding'
+import { useAppContext } from './context/AppContext'
 import { CookingMode } from './pages/CookingMode'
 import { Planner } from './pages/Planner'
 import { ShoppingList } from './pages/ShoppingList'
 import { PremiumModal } from './pages/PremiumModal'
 
 
+const AppContent = () => {
+  const { session, profile } = useAppContext();
+
+  if (!session) {
+    return <AuthOverlay />;
+  }
+
+  // Show onboarding if dietary preferences are strictly null (not set yet)
+  if (profile && profile.dietary_preferences === null) {
+    return <Onboarding />;
+  }
+
+  return (
+    <BrowserRouter basename="/cookflow/">
+      <Layout>
+        <AnimatedRoutes />
+      </Layout>
+    </BrowserRouter>
+  );
+};
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AppProvider>
-        <BrowserRouter basename="/cookflow/">
-          <Layout>
-            <AnimatedRoutes />
-          </Layout>
-        </BrowserRouter>
+        <AppContent />
       </AppProvider>
     </ThemeProvider>
   )

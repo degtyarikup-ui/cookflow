@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { supabase } from '../supabaseClient';
 
 const AppContext = createContext();
 
@@ -28,7 +29,7 @@ const initialRecipes = [
     isPremium: false
   },
   { id: "r5", title: "Трюфельное ризотто (Premium)", shortDescription: "Ресторанное блюдо у вас дома.", duration: "40 мин", difficulty: "Сложно", calories: "700 ккал", color: "from-slate-700 via-slate-800 to-slate-900",
-    youtubeId: "v1Y3_r4K3w4", // Note: Fake ID or random cooking video for demo
+    youtubeId: "v1Y3_r4K3w4",
     ingredients: ["300 г риса арборио", "1 л куриного бульона", "50 г трюфельной пасты", "100 мл белого вина", "Пармезан, сливочное масло, лук-шалот"],
     steps: ["Обжарьте лук-шалот на сливочном масле.", "Добавьте рис, обжарьте минуту, влейте вино.", "Постепенно добавляйте бульон, постоянно помешивая.", "В конце добавьте трюфельную пасту, пармезан и масло."],
     isPremium: true
@@ -36,58 +37,167 @@ const initialRecipes = [
 ];
 
 export const AppProvider = ({ children }) => {
+  const [session, setSession] = useState(null);
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
+
   const [recipes, setRecipes] = useState(() => {
-    const saved = localStorage.getItem('recipes');
-    return saved ? JSON.parse(saved) : initialRecipes;
+    if (supabase.isMock) {
+      const saved = localStorage.getItem('recipes');
+      return saved ? JSON.parse(saved) : initialRecipes;
+    }
+    return [];
   });
-
   const [savedIds, setSavedIds] = useState(() => {
-    const saved = localStorage.getItem('savedIds');
-    return saved ? JSON.parse(saved) : [initialRecipes[0].id, initialRecipes[1].id];
+    if (supabase.isMock) {
+      const saved = localStorage.getItem('savedIds');
+      return saved ? JSON.parse(saved) : [initialRecipes[0].id, initialRecipes[1].id];
+    }
+    return [];
   });
-
   const [planner, setPlanner] = useState(() => {
-    const saved = localStorage.getItem('planner');
-    return saved ? JSON.parse(saved) : {};
+    if (supabase.isMock) {
+      const saved = localStorage.getItem('planner');
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
   });
-
   const [isPremium, setIsPremium] = useState(() => {
-    const saved = localStorage.getItem('isPremium');
-    return saved ? JSON.parse(saved) : false;
+    if (supabase.isMock) {
+      const saved = localStorage.getItem('isPremium');
+      return saved ? JSON.parse(saved) : false;
+    }
+    return false;
   });
 
   useEffect(() => {
-    localStorage.setItem('recipes', JSON.stringify(recipes));
-  }, [recipes]);
+    if (supabase.isMock) {
+      localStorage.setItem('recipes', JSON.stringify(recipes));
+      localStorage.setItem('savedIds', JSON.stringify(savedIds));
+      localStorage.setItem('planner', JSON.stringify(planner));
+      localStorage.setItem('isPremium', JSON.stringify(isPremium));
+    }
+  }, [recipes, savedIds, planner, isPremium]);
 
   useEffect(() => {
-    localStorage.setItem('savedIds', JSON.stringify(savedIds));
-  }, [savedIds]);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchRecipes = useCallback(async () => {
+    if (supabase.isMock) return;
+    try {
+      const { data } = await supabase.from('recipes').select('*');
+      if (data && data.length > 0) setRecipes(data);
+      else if (data && data.length === 0) {
+          // fallback if table is empty
+          setRecipes(initialRecipes);
+      }
+    } catch {
+      setRecipes(initialRecipes);
+    }
+  }, []);
+
+  const fetchProfile = useCallback(async () => {
+    if (!user || supabase.isMock) return;
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (data) {
+        setProfile(data);
+        setIsPremium(data.is_premium);
+      }
+    } catch {}
+  }, [user]);
+
+  const fetchUserRecipes = useCallback(async () => {
+    if (!user || supabase.isMock) return;
+    try {
+      const { data } = await supabase
+        .from('user_recipes')
+        .select('recipe_id')
+        .eq('user_id', user.id)
+        .eq('is_saved', true);
+
+      if (data) setSavedIds(data.map(d => d.recipe_id));
+    } catch {}
+  }, [user]);
+
+  const fetchWeeklyPlan = useCallback(async () => {
+    if (!user || supabase.isMock) return;
+    try {
+      const { data } = await supabase
+        .from('weekly_plans')
+        .select('plan_data')
+        .eq('user_id', user.id)
+        .single();
+
+      if (data) setPlanner(data.plan_data);
+    } catch {}
+  }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('planner', JSON.stringify(planner));
-  }, [planner]);
+    if (user && !supabase.isMock) {
+      fetchProfile();
+      fetchUserRecipes();
+      fetchWeeklyPlan();
+    }
+  }, [user, fetchProfile, fetchUserRecipes, fetchWeeklyPlan]);
 
   useEffect(() => {
-    localStorage.setItem('isPremium', JSON.stringify(isPremium));
-  }, [isPremium]);
+    fetchRecipes();
+  }, [fetchRecipes]);
 
-  const toggleSave = (id) => {
-    setSavedIds(prev => prev.includes(id) ? prev.filter(rId => rId !== id) : [...prev, id]);
+  const toggleSave = async (recipeId) => {
+    const isCurrentlySaved = savedIds.includes(recipeId);
+
+    if (isCurrentlySaved) {
+      setSavedIds(prev => prev.filter(id => id !== recipeId));
+      if (user && !supabase.isMock) {
+        await supabase
+          .from('user_recipes')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('recipe_id', recipeId);
+      }
+    } else {
+      setSavedIds(prev => [...prev, recipeId]);
+      if (user && !supabase.isMock) {
+        await supabase
+          .from('user_recipes')
+          .upsert({ user_id: user.id, recipe_id: recipeId, is_saved: true });
+      }
+    }
   };
 
-  const addRecipe = (newRecipe) => {
-    setRecipes(prev => [...prev, newRecipe]);
-    setSavedIds(prev => [...prev, newRecipe.id]);
+  const skipAuth = () => {
+      // Just mark session as mocked so app loads
+      setSession({ mock: true });
+      setProfile({ dietary_preferences: [] });
   };
 
   return (
     <AppContext.Provider value={{
+      session, user, profile, setProfile,
       recipes, setRecipes,
       savedIds, toggleSave,
       planner, setPlanner,
       isPremium, setIsPremium,
-      addRecipe
+      fetchProfile, fetchWeeklyPlan,
+      skipAuth
     }}>
       {children}
     </AppContext.Provider>
