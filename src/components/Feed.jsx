@@ -65,11 +65,15 @@ const RecipeModal = ({ open, onClose, recipe }) => {
   );
 };
 
+import { useInView } from 'framer-motion';
+
 const ReelCard = ({ recipe, isSaved, onToggleSave, onOpenIngredients, isPremiumUser }) => {
   const [liked, setLiked] = useState(false);
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const navigate = useNavigate();
   const lastTapRef = useRef(0);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { amount: 0.6 }); // Requires at least 60% of video to be visible
 
   const isLocked = recipe.isPremium && !isPremiumUser;
 
@@ -86,11 +90,11 @@ const ReelCard = ({ recipe, isSaved, onToggleSave, onOpenIngredients, isPremiumU
   };
 
   return (
-    <div className="relative w-full flex flex-col bg-slate-900 overflow-hidden" style={{ minHeight: '100dvh' }} onClick={handleDoubleTap}>
+    <div ref={ref} className="relative w-full flex flex-col bg-slate-900 overflow-hidden" style={{ minHeight: '100dvh' }} onClick={handleDoubleTap}>
       {!isLocked && recipe.youtubeId ? (
          <ReactPlayer
            url={`https://www.youtube.com/watch?v=${recipe.youtubeId}`}
-           playing={true}
+           playing={isInView}
            loop={true}
            muted={true}
            width="100%"

@@ -69,6 +69,10 @@ export const AppProvider = ({ children }) => {
     }
     return false;
   });
+  const [customShoppingItems, setCustomShoppingItems] = useState(() => {
+    const saved = localStorage.getItem('customShoppingItems');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   useEffect(() => {
     if (supabase.isMock) {
@@ -77,7 +81,8 @@ export const AppProvider = ({ children }) => {
       localStorage.setItem('planner', JSON.stringify(planner));
       localStorage.setItem('isPremium', JSON.stringify(isPremium));
     }
-  }, [recipes, savedIds, planner, isPremium]);
+    localStorage.setItem('customShoppingItems', JSON.stringify(customShoppingItems));
+  }, [recipes, savedIds, planner, isPremium, customShoppingItems]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -189,6 +194,18 @@ export const AppProvider = ({ children }) => {
       setProfile({ dietary_preferences: [] });
   };
 
+  const logout = async () => {
+    if (!supabase.isMock) {
+      await supabase.auth.signOut();
+    }
+    setSession(null);
+    setUser(null);
+    setProfile(null);
+    setPlanner({});
+    setSavedIds([]);
+    setIsPremium(false);
+  };
+
   return (
     <AppContext.Provider value={{
       session, user, profile, setProfile,
@@ -196,8 +213,9 @@ export const AppProvider = ({ children }) => {
       savedIds, toggleSave,
       planner, setPlanner,
       isPremium, setIsPremium,
+      customShoppingItems, setCustomShoppingItems,
       fetchProfile, fetchWeeklyPlan,
-      skipAuth
+      skipAuth, logout
     }}>
       {children}
     </AppContext.Provider>

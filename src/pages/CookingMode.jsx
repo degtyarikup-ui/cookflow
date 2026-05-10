@@ -7,6 +7,8 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import TimerIcon from '@mui/icons-material/Timer';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 
@@ -69,6 +71,14 @@ export const CookingMode = () => {
   const recipe = recipes.find(r => r.id === id);
   const [currentStep, setCurrentStep] = useState(-1); // -1 is ingredients, 0+ are steps
   const [checkedIngredients, setCheckedIngredients] = useState({});
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Stop speaking when leaving component
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, []);
 
   if (!recipe) {
     return <Box sx={{ p: 4 }}>Рецепт не найден</Box>;
@@ -103,6 +113,24 @@ export const CookingMode = () => {
 
   const toggleIngredient = (idx) => {
     setCheckedIngredients(prev => ({...prev, [idx]: !prev[idx]}));
+  };
+
+  const handleSpeak = (text) => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ru-RU'; // Ensure Russian pronunciation
+      utterance.onend = () => setIsSpeaking(false);
+      setIsSpeaking(true);
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert("Ваш браузер не поддерживает чтение текста голосом.");
+    }
   };
 
   // Extract possible time from step to suggest a timer (very basic mock)
@@ -179,9 +207,17 @@ export const CookingMode = () => {
               </Typography>
 
               <Box sx={{ zIndex: 1, width: '100%', maxWidth: 500 }}>
-                <Typography variant="h4" fontWeight="medium" sx={{ lineHeight: 1.4 }}>
+                <Typography variant="h4" fontWeight="medium" sx={{ lineHeight: 1.4, mb: 3 }}>
                   {recipe.steps[currentStep]}
                 </Typography>
+
+                <IconButton
+                  onClick={() => handleSpeak(recipe.steps[currentStep])}
+                  sx={{ color: isSpeaking ? 'primary.main' : 'white', bgcolor: 'rgba(255,255,255,0.1)', mb: 2 }}
+                  size="large"
+                >
+                  {isSpeaking ? <VolumeOffIcon /> : <VolumeUpIcon />}
+                </IconButton>
 
                 {extractTimeInSeconds(recipe.steps[currentStep]) && (
                   <Timer initialSeconds={extractTimeInSeconds(recipe.steps[currentStep])} />

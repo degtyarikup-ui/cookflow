@@ -1,17 +1,42 @@
 import React, { useMemo, useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Box, Typography, Checkbox, List, ListItem, ListItemIcon, ListItemText, Paper, Divider, Button } from '@mui/material';
+import { Box, Typography, Checkbox, List, ListItem, ListItemIcon, ListItemText, Paper, Divider, Button, TextField, IconButton } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LocalGroceryStoreIcon from '@mui/icons-material/LocalGroceryStore';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export const ShoppingList = () => {
-  const { planner, recipes } = useAppContext();
+  const { planner, recipes, customShoppingItems, setCustomShoppingItems } = useAppContext();
   const [checkedItems, setCheckedItems] = useState({});
+  const [newItem, setNewItem] = useState('');
 
   const toggleCheck = (item) => {
     setCheckedItems(prev => ({ ...prev, [item]: !prev[item] }));
   };
+
+  const handleAddCustom = (e) => {
+    e.preventDefault();
+    if (newItem.trim()) {
+      setCustomShoppingItems([...customShoppingItems, { id: Date.now().toString(), text: newItem.trim() }]);
+      setNewItem('');
+    }
+  };
+
+  const clearChecked = () => {
+    const newCustom = customShoppingItems.filter(item => !checkedItems[item.id]);
+    setCustomShoppingItems(newCustom);
+
+    const newChecked = { ...checkedItems };
+    customShoppingItems.forEach(item => {
+        if(newChecked[item.id]) delete newChecked[item.id];
+    });
+    // For AI items, clearing them means hiding them, but they regenerate from planner.
+    // To keep it simple, we just clear the check marks for AI items and delete checked custom items.
+    setCheckedItems(newChecked);
+  };
+
 
   const shoppingList = useMemo(() => {
     const list = {};
@@ -48,9 +73,33 @@ export const ShoppingList = () => {
             <Typography variant="caption" color="text.secondary">Умный парсинг из меню</Typography>
           </Box>
         </Box>
+        {Object.values(checkedItems).some(Boolean) && (
+          <IconButton color="error" onClick={clearChecked} size="small" sx={{ bgcolor: 'error.50' }}>
+             <DeleteIcon fontSize="small" />
+          </IconButton>
+        )}
       </Box>
 
-      {items.length === 0 ? (
+      <form onSubmit={handleAddCustom} style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+        <TextField
+          size="small"
+          fullWidth
+          placeholder="Добавить свой продукт..."
+          value={newItem}
+          onChange={(e) => setNewItem(e.target.value)}
+          sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'white' } }}
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          sx={{ borderRadius: 3, minWidth: 40, px: 0 }}
+          disabled={!newItem.trim()}
+        >
+          <AddIcon />
+        </Button>
+      </form>
+
+      {items.length === 0 && customShoppingItems.length === 0 ? (
         <Box sx={{ p: 4, textAlign: 'center', bgcolor: 'white', borderRadius: 4, border: '1px solid', borderColor: 'grey.200', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
           <LocalGroceryStoreIcon sx={{ fontSize: 48, color: 'grey.300' }} />
           <Typography variant="body2" color="text.secondary">Ваш список пуст. Спланируйте меню, и мы автоматически соберем корзину продуктов.</Typography>
@@ -62,6 +111,33 @@ export const ShoppingList = () => {
             <Typography variant="caption" color="text.secondary">Количество суммировано примерно</Typography>
           </Box>
           <List disablePadding>
+            {customShoppingItems.map((item, idx) => {
+              const isChecked = checkedItems[item.id];
+              return (
+                <React.Fragment key={item.id}>
+                  <ListItem
+                    button
+                    onClick={() => toggleCheck(item.id)}
+                    sx={{ bgcolor: isChecked ? 'grey.50' : 'white', opacity: isChecked ? 0.6 : 1, transition: 'all 0.2s' }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      <Checkbox
+                        edge="start"
+                        checked={!!isChecked}
+                        disableRipple
+                        sx={{ color: 'primary.main', '&.Mui-checked': { color: 'primary.main' } }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={<Typography sx={{ textDecoration: isChecked ? 'line-through' : 'none', textTransform: 'capitalize' }}>{item.text}</Typography>}
+                      secondary="Добавлено вручную"
+                      secondaryTypographyProps={{ sx: { fontStyle: 'italic', fontSize: '10px' } }}
+                    />
+                  </ListItem>
+                  <Divider component="li" />
+                </React.Fragment>
+              );
+            })}
             {items.map(([key, data], idx) => {
               const isChecked = checkedItems[key];
               return (
