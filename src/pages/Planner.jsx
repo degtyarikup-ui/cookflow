@@ -7,6 +7,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import LockIcon from '@mui/icons-material/Lock';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 const DAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 const MEALS = ["Завтрак", "Обед", "Ужин"];
@@ -16,30 +17,35 @@ export const Planner = () => {
   const navigate = useNavigate();
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const generateMenu = () => {
+  const generateMenu = async () => {
     if (!isPremium) {
       navigate('/premium');
       return;
     }
 
     setIsGenerating(true);
-    setTimeout(() => {
-      const newPlanner = {};
-      DAYS.forEach(day => {
-        newPlanner[day] = {};
-        MEALS.forEach(meal => {
-          // Mock AI logic: pick a random recipe
-          const randomRecipe = recipes[Math.floor(Math.random() * recipes.length)];
-          newPlanner[day][meal] = randomRecipe.id;
-        });
-      });
-      setPlanner(newPlanner);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-menu');
+      if (error) throw error;
+      if (data?.plan?.plan_data) {
+        setPlanner(data.plan.plan_data);
+      }
+    } catch (e) {
+      console.error("Error generating menu:", e);
+      alert("Ошибка при генерации меню: " + e.message);
+    } finally {
       setIsGenerating(false);
-    }, 1500);
+    }
   };
 
-  const clearPlanner = () => {
+  const clearPlanner = async () => {
     setPlanner({});
+    if (!supabase.isMock) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('weekly_plans').delete().eq('user_id', user.id);
+      }
+    }
   };
 
   const getRecipeDetails = (id) => {

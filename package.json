@@ -17,6 +17,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.0.1",
     "@mui/material": "^9.0.1",
+    "@supabase/supabase-js": "^2.105.4",
     "autoprefixer": "^10.4.19",
     "canvas-confetti": "^1.9.4",
     "framer-motion": "^12.38.0",

@@ -117,22 +117,56 @@ const theme = createTheme({
 
 import { Feed } from './components/Feed'
 import { Library } from './pages/Library'
+import { AuthOverlay } from './components/AuthOverlay'
+import { Onboarding } from './pages/Onboarding'
+import { useAppContext } from './context/AppContext'
 import { CookingMode } from './pages/CookingMode'
 import { Planner } from './pages/Planner'
 import { ShoppingList } from './pages/ShoppingList'
 import { PremiumModal } from './pages/PremiumModal'
+import { ProfileOverlay } from './components/ProfileOverlay'
+import { useState } from 'react'
+import { Avatar, IconButton } from '@mui/material'
+import PersonIcon from '@mui/icons-material/Person'
 
+
+const AppContent = () => {
+  const [profileOpen, setProfileOpen] = useState(false);
+  const { session, profile } = useAppContext();
+
+  if (!session) {
+    return <AuthOverlay />;
+  }
+
+  // Show onboarding if dietary preferences are strictly null (not set yet)
+  if (profile && profile.dietary_preferences === null) {
+    return <Onboarding />;
+  }
+
+  return (
+    <BrowserRouter basename="/cookflow/">
+      <div className="fixed top-0 right-0 z-50 p-4 pt-[max(env(safe-area-inset-top),1rem)]">
+        <IconButton onClick={() => setProfileOpen(true)} sx={{ bgcolor: 'white', boxShadow: 1, '&:hover': { bgcolor: 'grey.100' } }}>
+          <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+            <PersonIcon fontSize="small" />
+          </Avatar>
+        </IconButton>
+      </div>
+      <ProfileOverlay open={profileOpen} onClose={() => setProfileOpen(false)} />
+
+      <Layout>
+        <AnimatedRoutes />
+      </Layout>
+    </BrowserRouter>
+  );
+};
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AppProvider>
-        <BrowserRouter basename="/cookflow/">
-          <Layout>
-            <AnimatedRoutes />
-          </Layout>
-        </BrowserRouter>
+        <AppContent />
       </AppProvider>
     </ThemeProvider>
   )
