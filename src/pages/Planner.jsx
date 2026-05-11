@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Box, Typography, Button, Paper, Chip, IconButton } from '@mui/material';
+import { Box, Typography, Button, Paper, IconButton } from '@mui/material';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import AddIcon from '@mui/icons-material/Add';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import LockIcon from '@mui/icons-material/Lock';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
@@ -48,8 +47,16 @@ export const Planner = () => {
     }
   };
 
+  // ⚡ Bolt: Memoize recipe lookups to O(1) instead of O(N) per cell
+  const recipeMap = useMemo(() => {
+    return recipes.reduce((acc, recipe) => {
+      acc[recipe.id] = recipe;
+      return acc;
+    }, {});
+  }, [recipes]);
+
   const getRecipeDetails = (id) => {
-    return recipes.find(r => r.id === id);
+    return recipeMap[id];
   };
 
   return (
