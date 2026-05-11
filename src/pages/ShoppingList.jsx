@@ -74,7 +74,7 @@ export const ShoppingList = () => {
           </Box>
         </Box>
         {Object.values(checkedItems).some(Boolean) && (
-          <IconButton color="error" onClick={clearChecked} size="small" sx={{ bgcolor: 'error.50' }}>
+          <IconButton aria-label="Удалить отмеченные продукты" color="error" onClick={clearChecked} size="small" sx={{ bgcolor: 'error.50' }}>
              <DeleteIcon fontSize="small" />
           </IconButton>
         )}
