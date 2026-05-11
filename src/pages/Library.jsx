@@ -1,11 +1,9 @@
-import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { Typography, Box, Card, CardContent, IconButton, Chip } from '@mui/material';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 export const Library = () => {
   const { recipes, savedIds, toggleSave } = useAppContext();

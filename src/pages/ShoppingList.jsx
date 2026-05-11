@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Box, Typography, Checkbox, List, ListItem, ListItemIcon, ListItemText, Paper, Divider, Button } from '@mui/material';
+import { Box, Typography, Checkbox, List, ListItem, ListItemIcon, ListItemText, Paper, Divider } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LocalGroceryStoreIcon from '@mui/icons-material/LocalGroceryStore';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -21,7 +21,7 @@ export const ShoppingList = () => {
         if (recipe) {
           recipe.ingredients.forEach(ing => {
             // Simple mock parser: strip numbers and standard units for grouping
-            const cleanName = ing.replace(/^[0-9/\.\s]+(г|мл|шт|ст\.л\.|ч\.л\.|зубчика|зубчик|ст|кг|литр|л)\s+/i, '').toLowerCase().trim();
+            const cleanName = ing.replace(/^[0-9/.\s]+(г|мл|шт|ст\.л\.|ч\.л\.|зубчика|зубчик|ст|кг|литр|л)\s+/i, '').toLowerCase().trim();
             if (list[cleanName]) {
               list[cleanName].raw.push(ing);
             } else {

@@ -1,0 +1,3 @@
+## 2024-05-11 - [Workaround React-Hooks Exhaustive-Deps Lint warning for Set Timeout inside Effect]
+**Learning:** Resolving a `react-hooks/set-state-in-effect` lint warning by wrapping the state update in a `setTimeout(..., 0)` inside a `useEffect` is an anti-pattern. While it moves the update out of the current render cycle, it introduces a subtle race condition/flicker and violates React's intended effect handling.
+**Action:** Instead of introducing hacky workarounds to bypass lint rules, properly ignore them using `// eslint-disable-next-line react-hooks/set-state-in-effect` if the state update inside the effect is strictly required by the application's flow.

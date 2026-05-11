@@ -22,6 +22,7 @@ const Timer = ({ initialSeconds }) => {
       }, 1000);
     } else if (seconds === 0 && isActive) {
       clearInterval(interval);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsActive(false);
       // Optional: play sound here
     }

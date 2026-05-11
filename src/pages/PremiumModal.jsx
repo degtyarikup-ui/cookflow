@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Box, Typography, Button, Paper, List, ListItem, ListItemIcon, ListItemText, Switch } from '@mui/material';
+import { Box, Typography, Button, Paper, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';

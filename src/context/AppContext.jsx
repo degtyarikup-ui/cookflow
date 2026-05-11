@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const AppContext = createContext();
 
@@ -72,9 +72,9 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem('isPremium', JSON.stringify(isPremium));
   }, [isPremium]);
 
-  const toggleSave = (id) => {
+  const toggleSave = useCallback((id) => {
     setSavedIds(prev => prev.includes(id) ? prev.filter(rId => rId !== id) : [...prev, id]);
-  };
+  }, []);
 
   const addRecipe = (newRecipe) => {
     setRecipes(prev => [...prev, newRecipe]);
@@ -94,4 +94,5 @@ export const AppProvider = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAppContext = () => useContext(AppContext);
