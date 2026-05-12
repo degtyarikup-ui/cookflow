@@ -38,6 +38,7 @@ export const Library = () => {
               <Box sx={{ width: 100, flexShrink: 0, position: 'relative' }}>
                 <Box className={`absolute inset-0 bg-gradient-to-br ${recipe.color}`} />
                 <IconButton
+                  aria-label="Готовить"
                   onClick={() => navigate(`/cooking/${recipe.id}`)}
                   sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'white', '&:hover': { bgcolor: 'white' }, boxShadow: 2 }}
                   size="small"
@@ -50,6 +51,7 @@ export const Library = () => {
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <Typography variant="subtitle2" fontWeight="bold" sx={{ pr: 3, lineHeight: 1.2, mb: 0.5 }}>{recipe.title}</Typography>
                     <IconButton
+                      aria-label="Удалить из сохраненных"
                       size="small"
                       onClick={() => toggleSave(recipe.id)}
                       sx={{ position: 'absolute', top: 4, right: 4 }}

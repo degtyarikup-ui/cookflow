@@ -1,7 +1,6 @@
-import { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { supabase } from '../supabaseClient';
-import { Box, Typography, Button, Paper, Avatar, Dialog, DialogContent, DialogTitle, IconButton, Chip } from '@mui/material';
+import { Box, Typography, Button, Avatar, Dialog, DialogContent, DialogTitle, IconButton, Chip } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import PersonIcon from '@mui/icons-material/Person';
 import StarIcon from '@mui/icons-material/Star';
@@ -23,7 +22,7 @@ export const ProfileOverlay = ({ open, onClose }) => {
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 4, position: 'absolute', top: 20, m: 2 } }}>
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
         <Typography variant="h6" fontWeight="bold">Профиль</Typography>
-        <IconButton onClick={onClose} size="small"><CloseIcon /></IconButton>
+        <IconButton aria-label="Закрыть" onClick={onClose} size="small"><CloseIcon /></IconButton>
       </DialogTitle>
 
       <DialogContent>
