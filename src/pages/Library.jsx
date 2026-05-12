@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { Typography, Box, Card, CardContent, IconButton, Chip } from '@mui/material';
+import { Typography, Box, Card, CardContent, IconButton, Chip, Button } from '@mui/material';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -28,8 +28,9 @@ export const Library = () => {
       </Box>
 
       {savedRecipes.length === 0 ? (
-        <Box sx={{ p: 3, textAlign: 'center', bgcolor: 'white', borderRadius: 4, border: '1px solid', borderColor: 'grey.200' }}>
+        <Box sx={{ p: 3, textAlign: 'center', bgcolor: 'white', borderRadius: 4, border: '1px solid', borderColor: 'grey.200', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
           <Typography variant="body2" color="text.secondary">У вас пока нет сохраненных рецептов. Сохраняйте их из ленты!</Typography>
+          <Button variant="contained" onClick={() => navigate('/')} sx={{ borderRadius: 3, textTransform: 'none' }}>Перейти в ленту</Button>
         </Box>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -41,6 +42,7 @@ export const Library = () => {
                   onClick={() => navigate(`/cooking/${recipe.id}`)}
                   sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'white', '&:hover': { bgcolor: 'white' }, boxShadow: 2 }}
                   size="small"
+                  aria-label={`Готовить ${recipe.title}`}
                 >
                   <PlayArrowIcon color="primary" fontSize="small" />
                 </IconButton>
@@ -53,6 +55,7 @@ export const Library = () => {
                       size="small"
                       onClick={() => toggleSave(recipe.id)}
                       sx={{ position: 'absolute', top: 4, right: 4 }}
+                      aria-label="Удалить из сохраненных"
                     >
                       <BookmarkIcon color="primary" fontSize="small" />
                     </IconButton>

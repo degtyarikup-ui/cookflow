@@ -1,0 +1,3 @@
+## 2024-03-24 - Dead Ends in User Flows
+**Learning:** Empty states without clear Call-to-Action (CTA) buttons can create dead ends in the user flow, reducing engagement and causing friction when users don't know where to go next.
+**Action:** Always include a relevant CTA button in empty states (e.g., "Go to Feed" when saved items are empty, "Go to Planner" when shopping list is empty) to guide users to the next logical step in their journey.

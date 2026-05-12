@@ -6,9 +6,11 @@ import LocalGroceryStoreIcon from '@mui/icons-material/LocalGroceryStore';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useNavigate } from 'react-router-dom';
 
 export const ShoppingList = () => {
   const { planner, recipes, customShoppingItems, setCustomShoppingItems } = useAppContext();
+  const navigate = useNavigate();
   const [checkedItems, setCheckedItems] = useState({});
   const [newItem, setNewItem] = useState('');
 
@@ -46,7 +48,7 @@ export const ShoppingList = () => {
         if (recipe) {
           recipe.ingredients.forEach(ing => {
             // Simple mock parser: strip numbers and standard units for grouping
-            const cleanName = ing.replace(/^[0-9/\.\s]+(г|мл|шт|ст\.л\.|ч\.л\.|зубчика|зубчик|ст|кг|литр|л)\s+/i, '').toLowerCase().trim();
+            const cleanName = ing.replace(/^[0-9/.\s]+(г|мл|шт|ст\.л\.|ч\.л\.|зубчика|зубчик|ст|кг|литр|л)\s+/i, '').toLowerCase().trim();
             if (list[cleanName]) {
               list[cleanName].raw.push(ing);
             } else {
@@ -74,7 +76,7 @@ export const ShoppingList = () => {
           </Box>
         </Box>
         {Object.values(checkedItems).some(Boolean) && (
-          <IconButton color="error" onClick={clearChecked} size="small" sx={{ bgcolor: 'error.50' }}>
+          <IconButton color="error" onClick={clearChecked} size="small" sx={{ bgcolor: 'error.50' }} aria-label="Удалить отмеченные продукты">
              <DeleteIcon fontSize="small" />
           </IconButton>
         )}
@@ -88,12 +90,14 @@ export const ShoppingList = () => {
           value={newItem}
           onChange={(e) => setNewItem(e.target.value)}
           sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'white' } }}
+          inputProps={{ 'aria-label': 'Добавить свой продукт' }}
         />
         <Button
           type="submit"
           variant="contained"
           sx={{ borderRadius: 3, minWidth: 40, px: 0 }}
           disabled={!newItem.trim()}
+          aria-label="Добавить продукт"
         >
           <AddIcon />
         </Button>
@@ -103,6 +107,7 @@ export const ShoppingList = () => {
         <Box sx={{ p: 4, textAlign: 'center', bgcolor: 'white', borderRadius: 4, border: '1px solid', borderColor: 'grey.200', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
           <LocalGroceryStoreIcon sx={{ fontSize: 48, color: 'grey.300' }} />
           <Typography variant="body2" color="text.secondary">Ваш список пуст. Спланируйте меню, и мы автоматически соберем корзину продуктов.</Typography>
+          <Button variant="contained" onClick={() => navigate('/planner')} sx={{ borderRadius: 3, textTransform: 'none' }}>Перейти в план</Button>
         </Box>
       ) : (
         <Paper variant="outlined" sx={{ borderRadius: 4, overflow: 'hidden' }}>
