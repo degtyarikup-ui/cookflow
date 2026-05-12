@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, memo } from 'react';
 import ReactPlayer from 'react-player';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '../context/AppContext';
@@ -67,7 +67,11 @@ const RecipeModal = ({ open, onClose, recipe }) => {
 
 import { useInView } from 'framer-motion';
 
-const ReelCard = ({ recipe, isSaved, onToggleSave, onOpenIngredients, isPremiumUser }) => {
+// ⚡ Bolt Optimization: Memoizing ReelCard to prevent re-rendering the heavy
+// ReactPlayer and animations when the parent Feed component's local state
+// (like modalRecipe) changes. This significantly improves UI responsiveness
+// when opening the ingredients modal.
+const ReelCard = memo(({ recipe, isSaved, onToggleSave, onOpenIngredients, isPremiumUser }) => {
   const [liked, setLiked] = useState(false);
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const navigate = useNavigate();
@@ -206,7 +210,9 @@ const ReelCard = ({ recipe, isSaved, onToggleSave, onOpenIngredients, isPremiumU
       </div>
     </div>
   );
-};
+});
+
+ReelCard.displayName = 'ReelCard';
 
 export const Feed = () => {
   const { recipes, savedIds, toggleSave, isPremium } = useAppContext();
