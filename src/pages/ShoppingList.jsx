@@ -39,14 +39,21 @@ export const ShoppingList = () => {
 
 
   const shoppingList = useMemo(() => {
+    // ⚡ Bolt: Create O(1) hash map instead of O(N) recipes.find inside nested loops
+    // Reduces complexity from O(DAYS * MEALS * RECIPES) to O(RECIPES + DAYS * MEALS)
+    const recipesMap = recipes.reduce((acc, recipe) => {
+      acc[recipe.id] = recipe;
+      return acc;
+    }, {});
+
     const list = {};
     Object.values(planner).forEach(day => {
       Object.values(day).forEach(recipeId => {
-        const recipe = recipes.find(r => r.id === recipeId);
+        const recipe = recipesMap[recipeId];
         if (recipe) {
           recipe.ingredients.forEach(ing => {
             // Simple mock parser: strip numbers and standard units for grouping
-            const cleanName = ing.replace(/^[0-9/\.\s]+(г|мл|шт|ст\.л\.|ч\.л\.|зубчика|зубчик|ст|кг|литр|л)\s+/i, '').toLowerCase().trim();
+            const cleanName = ing.replace(/^[0-9/.\s]+(г|мл|шт|ст\.л\.|ч\.л\.|зубчика|зубчик|ст|кг|литр|л)\s+/i, '').toLowerCase().trim();
             if (list[cleanName]) {
               list[cleanName].raw.push(ing);
             } else {
@@ -111,7 +118,7 @@ export const ShoppingList = () => {
             <Typography variant="caption" color="text.secondary">Количество суммировано примерно</Typography>
           </Box>
           <List disablePadding>
-            {customShoppingItems.map((item, idx) => {
+            {customShoppingItems.map((item) => {
               const isChecked = checkedItems[item.id];
               return (
                 <React.Fragment key={item.id}>

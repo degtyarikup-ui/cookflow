@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Box, Typography, Button, Paper, Chip, IconButton } from '@mui/material';
+import { Box, Typography, Button, Paper, IconButton } from '@mui/material';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import AddIcon from '@mui/icons-material/Add';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import LockIcon from '@mui/icons-material/Lock';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
@@ -48,9 +47,14 @@ export const Planner = () => {
     }
   };
 
-  const getRecipeDetails = (id) => {
-    return recipes.find(r => r.id === id);
-  };
+  // ⚡ Bolt: Convert O(N) lookup to O(1) by creating a hash map of recipes
+  // Reduces complexity from O(DAYS * MEALS * RECIPES) to O(RECIPES + DAYS * MEALS)
+  const recipesMap = useMemo(() => {
+    return recipes.reduce((acc, recipe) => {
+      acc[recipe.id] = recipe;
+      return acc;
+    }, {});
+  }, [recipes]);
 
   return (
     <Box sx={{ p: 2, pb: 12 }}>
@@ -103,7 +107,7 @@ export const Planner = () => {
             </Box>
             {DAYS.map(day => {
               const assignedId = planner[day]?.[meal];
-              const recipe = assignedId ? getRecipeDetails(assignedId) : null;
+              const recipe = assignedId ? recipesMap[assignedId] : null;
 
               return (
                 <Box key={day} sx={{ flex: 1, borderLeft: 1, borderColor: 'grey.100', p: 0.5, minHeight: 60, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative', '&:hover': { bgcolor: 'grey.50' } }}>
