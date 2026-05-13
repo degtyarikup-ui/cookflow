@@ -144,7 +144,7 @@ export const CookingMode = () => {
   return (
     <Box sx={{ height: '100dvh', width: '100%', bgcolor: 'black', color: 'white', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 10 }}>
-        <IconButton aria-label="Закрыть" onClick={() => navigate(-1)} sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.2)' }}>
+        <IconButton aria-label="Закрыть режим готовки" onClick={() => navigate(-1)} sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.2)' }}>
           <CloseIcon />
         </IconButton>
         <Typography variant="caption" fontWeight="bold">РЕЖИМ ГОТОВКИ</Typography>
@@ -232,7 +232,7 @@ export const CookingMode = () => {
 
       <Box sx={{ p: 4, display: 'flex', justifySelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center', pb: 'calc(2rem + env(safe-area-inset-bottom))' }}>
         <IconButton
-          aria-label="Назад"
+          aria-label="Предыдущий шаг"
           onClick={prevStep}
           disabled={currentStep === -1}
           sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.2)', width: 64, height: 64, '&:disabled': { opacity: 0.3 } }}

@@ -146,7 +146,7 @@ const AppContent = () => {
   return (
     <BrowserRouter basename="/cookflow/">
       <div className="fixed top-0 right-0 z-50 p-4 pt-[max(env(safe-area-inset-top),1rem)]">
-        <IconButton aria-label="Профиль" onClick={() => setProfileOpen(true)} sx={{ bgcolor: 'white', boxShadow: 1, '&:hover': { bgcolor: 'grey.100' } }}>
+        <IconButton aria-label="Открыть профиль" onClick={() => setProfileOpen(true)} sx={{ bgcolor: 'white', boxShadow: 1, '&:hover': { bgcolor: 'grey.100' } }}>
           <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
             <PersonIcon fontSize="small" />
           </Avatar>
