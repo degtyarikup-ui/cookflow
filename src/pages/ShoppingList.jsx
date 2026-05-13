@@ -74,7 +74,7 @@ export const ShoppingList = () => {
           </Box>
         </Box>
         {Object.values(checkedItems).some(Boolean) && (
-          <IconButton color="error" onClick={clearChecked} size="small" sx={{ bgcolor: 'error.50' }}>
+          <IconButton aria-label="Удалить выбранные" color="error" onClick={clearChecked} size="small" sx={{ bgcolor: 'error.50' }}>
              <DeleteIcon fontSize="small" />
           </IconButton>
         )}
@@ -90,6 +90,7 @@ export const ShoppingList = () => {
           sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'white' } }}
         />
         <Button
+          aria-label="Добавить продукт"
           type="submit"
           variant="contained"
           sx={{ borderRadius: 3, minWidth: 40, px: 0 }}

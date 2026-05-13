@@ -27,7 +27,7 @@ const RecipeModal = ({ open, onClose, recipe }) => {
           <RestaurantIcon color="primary" />
           <Typography variant="subtitle1" fontWeight="bold">Ингредиенты & Шаги</Typography>
         </Box>
-        <IconButton onClick={onClose} sx={{ color: 'text.secondary' }}>
+        <IconButton aria-label="Закрыть" onClick={onClose} sx={{ color: 'text.secondary' }}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -148,7 +148,7 @@ const ReelCard = ({ recipe, isSaved, onToggleSave, onOpenIngredients, isPremiumU
           onClick={(e) => { e.stopPropagation(); setLiked(!liked); }}
           className="flex flex-col items-center gap-1"
         >
-          <div className="p-3 bg-black/40 rounded-full backdrop-blur-md border border-white/10 text-white shadow-lg">
+          <div aria-label={liked ? "Не нравится" : "Нравится"} className="p-3 bg-black/40 rounded-full backdrop-blur-md border border-white/10 text-white shadow-lg">
             {liked ? <FavoriteIcon sx={{ color: '#ef4444' }} /> : <FavoriteBorderIcon />}
           </div>
           <span className="text-white text-xs font-medium drop-shadow-md">{liked ? '1.2k' : '1.1k'}</span>
@@ -159,7 +159,7 @@ const ReelCard = ({ recipe, isSaved, onToggleSave, onOpenIngredients, isPremiumU
           onClick={(e) => { e.stopPropagation(); onToggleSave(recipe.id); }}
           className="flex flex-col items-center gap-1"
         >
-          <div className={`p-3 rounded-full backdrop-blur-md border border-white/10 shadow-lg transition-colors ${isSaved ? 'bg-primary-500 text-white' : 'bg-black/40 text-white'}`}>
+          <div aria-label={isSaved ? "Удалить из сохраненных" : "Сохранить"} className={`p-3 rounded-full backdrop-blur-md border border-white/10 shadow-lg transition-colors ${isSaved ? 'bg-primary-500 text-white' : 'bg-black/40 text-white'}`}>
             {isSaved ? <BookmarkIcon /> : <BookmarkBorderIcon />}
           </div>
           <span className="text-white text-xs font-medium drop-shadow-md">Сохранить</span>
@@ -170,7 +170,7 @@ const ReelCard = ({ recipe, isSaved, onToggleSave, onOpenIngredients, isPremiumU
           onClick={(e) => { e.stopPropagation(); navigate(`/cooking/${recipe.id}`); }}
           className="flex flex-col items-center gap-1"
         >
-          <div className="p-3 bg-black/40 rounded-full backdrop-blur-md border border-white/10 text-white shadow-lg">
+          <div aria-label="Готовить" className="p-3 bg-black/40 rounded-full backdrop-blur-md border border-white/10 text-white shadow-lg">
             <PlayArrowIcon />
           </div>
           <span className="text-white text-xs font-medium drop-shadow-md">Готовить</span>

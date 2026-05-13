@@ -114,7 +114,7 @@ export const Planner = () => {
                       </Typography>
                     </Box>
                   ) : (
-                    <IconButton size="small" sx={{ opacity: 0.3 }}>
+                    <IconButton aria-label="Добавить блюдо" size="small" sx={{ opacity: 0.3 }}>
                       <AddIcon fontSize="small" />
                     </IconButton>
                   )}
