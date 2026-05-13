@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, memo } from 'react';
 import ReactPlayer from 'react-player';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '../context/AppContext';
@@ -67,7 +67,7 @@ const RecipeModal = ({ open, onClose, recipe }) => {
 
 import { useInView } from 'framer-motion';
 
-const ReelCard = ({ recipe, isSaved, onToggleSave, onOpenIngredients, isPremiumUser }) => {
+const ReelCard = memo(({ recipe, isSaved, onToggleSave, onOpenIngredients, isPremiumUser }) => {
   const [liked, setLiked] = useState(false);
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const navigate = useNavigate();
@@ -206,11 +206,16 @@ const ReelCard = ({ recipe, isSaved, onToggleSave, onOpenIngredients, isPremiumU
       </div>
     </div>
   );
-};
+});
+
+ReelCard.displayName = 'ReelCard';
 
 export const Feed = () => {
   const { recipes, savedIds, toggleSave, isPremium } = useAppContext();
   const [modalRecipe, setModalRecipe] = useState(null);
+  const handleOpenIngredients = useCallback((recipe) => {
+    setModalRecipe(recipe);
+  }, []);
 
   return (
     <>
@@ -221,7 +226,7 @@ export const Feed = () => {
             recipe={recipe}
             isSaved={savedIds.includes(recipe.id)}
             onToggleSave={toggleSave}
-            onOpenIngredients={setModalRecipe}
+            onOpenIngredients={handleOpenIngredients}
             isPremiumUser={isPremium}
           />
         ))}

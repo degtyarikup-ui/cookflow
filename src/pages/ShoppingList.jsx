@@ -6,9 +6,11 @@ import LocalGroceryStoreIcon from '@mui/icons-material/LocalGroceryStore';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useNavigate } from 'react-router-dom';
 
 export const ShoppingList = () => {
   const { planner, recipes, customShoppingItems, setCustomShoppingItems } = useAppContext();
+  const navigate = useNavigate();
   const [checkedItems, setCheckedItems] = useState({});
   const [newItem, setNewItem] = useState('');
 
@@ -39,14 +41,19 @@ export const ShoppingList = () => {
 
 
   const shoppingList = useMemo(() => {
+    const recipesById = recipes.reduce((acc, recipe) => {
+      acc[recipe.id] = recipe;
+      return acc;
+    }, {});
+
     const list = {};
     Object.values(planner).forEach(day => {
       Object.values(day).forEach(recipeId => {
-        const recipe = recipes.find(r => r.id === recipeId);
+        const recipe = recipesById[recipeId];
         if (recipe) {
           recipe.ingredients.forEach(ing => {
             // Simple mock parser: strip numbers and standard units for grouping
-            const cleanName = ing.replace(/^[0-9/\.\s]+(г|мл|шт|ст\.л\.|ч\.л\.|зубчика|зубчик|ст|кг|литр|л)\s+/i, '').toLowerCase().trim();
+            const cleanName = ing.replace(/^[0-9/.\s]+(г|мл|шт|ст\.л\.|ч\.л\.|зубчика|зубчик|ст|кг|литр|л)\s+/i, '').toLowerCase().trim();
             if (list[cleanName]) {
               list[cleanName].raw.push(ing);
             } else {
@@ -88,6 +95,7 @@ export const ShoppingList = () => {
           value={newItem}
           onChange={(e) => setNewItem(e.target.value)}
           sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'white' } }}
+          inputProps={{ 'aria-label': 'Добавить свой продукт' }}
         />
         <Button
           aria-label="Добавить продукт"
@@ -104,6 +112,7 @@ export const ShoppingList = () => {
         <Box sx={{ p: 4, textAlign: 'center', bgcolor: 'white', borderRadius: 4, border: '1px solid', borderColor: 'grey.200', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
           <LocalGroceryStoreIcon sx={{ fontSize: 48, color: 'grey.300' }} />
           <Typography variant="body2" color="text.secondary">Ваш список пуст. Спланируйте меню, и мы автоматически соберем корзину продуктов.</Typography>
+          <Button variant="contained" onClick={() => navigate('/planner')} sx={{ borderRadius: 3, textTransform: 'none' }}>Перейти в план</Button>
         </Box>
       ) : (
         <Paper variant="outlined" sx={{ borderRadius: 4, overflow: 'hidden' }}>
@@ -112,7 +121,7 @@ export const ShoppingList = () => {
             <Typography variant="caption" color="text.secondary">Количество суммировано примерно</Typography>
           </Box>
           <List disablePadding>
-            {customShoppingItems.map((item, idx) => {
+            {customShoppingItems.map((item) => {
               const isChecked = checkedItems[item.id];
               return (
                 <React.Fragment key={item.id}>

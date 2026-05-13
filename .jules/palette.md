@@ -1,3 +1,0 @@
-## 2024-05-12 - [ARIA Labels on Custom Motion Buttons]
-**Learning:** When adding `aria-label`s to custom complex button components like `motion.button` that contain both icon elements and visible text spans (e.g., in `Feed.jsx`), adding the `aria-label` to the parent `<button>` will cause screen readers to ignore the inner visible text. Furthermore, using `aria-hidden="true"` on the text span hides vital information from screen reader users.
-**Action:** Apply the `aria-label` directly to the `<div>` or wrapper element containing the icon, rather than the parent `<button>`, so that both the icon description and the accompanying text are announced correctly by screen readers.

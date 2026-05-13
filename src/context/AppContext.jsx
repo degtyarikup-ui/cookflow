@@ -125,7 +125,9 @@ export const AppProvider = ({ children }) => {
         setProfile(data);
         setIsPremium(data.is_premium);
       }
-    } catch {}
+    } catch {
+      // Profile is optional in mock or partially configured Supabase projects.
+    }
   }, [user]);
 
   const fetchUserRecipes = useCallback(async () => {
@@ -138,7 +140,9 @@ export const AppProvider = ({ children }) => {
         .eq('is_saved', true);
 
       if (data) setSavedIds(data.map(d => d.recipe_id));
-    } catch {}
+    } catch {
+      // Saved recipes are optional for new users.
+    }
   }, [user]);
 
   const fetchWeeklyPlan = useCallback(async () => {
@@ -151,11 +155,14 @@ export const AppProvider = ({ children }) => {
         .single();
 
       if (data) setPlanner(data.plan_data);
-    } catch {}
+    } catch {
+      // Weekly plans are optional for new users.
+    }
   }, [user]);
 
   useEffect(() => {
     if (user && !supabase.isMock) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchProfile();
       fetchUserRecipes();
       fetchWeeklyPlan();
@@ -163,10 +170,11 @@ export const AppProvider = ({ children }) => {
   }, [user, fetchProfile, fetchUserRecipes, fetchWeeklyPlan]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchRecipes();
   }, [fetchRecipes]);
 
-  const toggleSave = async (recipeId) => {
+  const toggleSave = useCallback(async (recipeId) => {
     const isCurrentlySaved = savedIds.includes(recipeId);
 
     if (isCurrentlySaved) {
@@ -186,7 +194,7 @@ export const AppProvider = ({ children }) => {
           .upsert({ user_id: user.id, recipe_id: recipeId, is_saved: true });
       }
     }
-  };
+  }, [savedIds, user]);
 
   const skipAuth = () => {
       // Just mark session as mocked so app loads
@@ -222,4 +230,5 @@ export const AppProvider = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAppContext = () => useContext(AppContext);

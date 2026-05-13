@@ -6,7 +6,7 @@ import { Box, Typography, Button, Paper, Checkbox, FormControlLabel, FormGroup }
 const DIET_OPTIONS = ["Вегетарианец", "Без глютена", "Высокий белок", "Кето", "Низкокалорийное"];
 
 export const Onboarding = () => {
-  const { user, profile, fetchProfile } = useAppContext();
+  const { user, fetchProfile } = useAppContext();
   const [selected, setSelected] = useState([]);
   const [loading, setLoading] = useState(false);
 
